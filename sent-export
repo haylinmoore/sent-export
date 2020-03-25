@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+echo "Please click on the 'sent' window"
+
 pid=$(xdotool selectwindow)
 
 lastfile="$0"
@@ -9,16 +11,21 @@ echo "Found 'sent' window $pid"
 
 id=0
 
-mkdir temp
+mkdir "export"
 
 cycle () {
 	id=$((++id));
-	cfile="./temp/slide-$id.png";
+	cfile="./export/slide-$id.png";
 	maim -i "$pid" "$cfile";
 
 	DIFF=$(diff "$lastfile" "$cfile")
 
-
+	if [ "$DIFF" = "" ]
+	then
+		rm "$cfile"
+		echo "Finished Export"
+		exit;
+	fi
 
 	lastfile="$cfile"
 
@@ -26,12 +33,7 @@ cycle () {
 }
 
 while true; do
-    read -p "Capture this slide? " yn
-    case $yn in
-	[Yy]* ) cycle;;
-        [Nn]* ) exit;;
-        * ) echo "Please answer yes or no.";;
-    esac
+	cycle;
 done
 
 

@@ -1,0 +1,37 @@
+#!/usr/bin/env bash
+
+pid=$(xdotool selectwindow)
+
+lastfile="$0"
+cfile=""
+
+echo "Found 'sent' window $pid"
+
+id=0
+
+mkdir temp
+
+cycle () {
+	id=$((++id));
+	cfile="./temp/slide-$id.png";
+	maim -i "$pid" "$cfile";
+
+	DIFF=$(diff "$lastfile" "$cfile")
+
+
+
+	lastfile="$cfile"
+
+	xdotool key --window "$pid" Right
+}
+
+while true; do
+    read -p "Capture this slide? " yn
+    case $yn in
+	[Yy]* ) cycle;;
+        [Nn]* ) exit;;
+        * ) echo "Please answer yes or no.";;
+    esac
+done
+
+

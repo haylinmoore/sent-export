@@ -1,26 +1,36 @@
-#!/usr/bin/env bash
+#!/bin/bash
+
+if [[ -z "$@" ]]; then
+    echo >&2 "You must supply an argument!"
+    exit 1
+elif [[ ! -d "$@" ]]; then
+    echo >&2 "$@ is not a valid directory!"
+    exit 1
+fi
+
+echo "Directory $@ was selected"
 
 echo "Please click on the 'sent' window"
 
 pid=$(xdotool selectwindow)
 
-lastfile="$0"
+lastfile="/dev/null"
 cfile=""
 
 echo "Found 'sent' window $pid"
 
 id=0
 
-mkdir "export"
+rm -rf "$@/*"
 
 cycle () {
 	id=$((++id));
 	cfile="./export/slide-$id.png";
-	maim -i "$pid" "$cfile";
+	maim --hidecursor -i "$pid" "$cfile";
 
 	DIFF=$(diff "$lastfile" "$cfile")
 
-	if [ "$DIFF" = "" ]
+	if [ -z "$DIFF" ]
 	then
 		rm "$cfile"
 		echo "Finished Export"
@@ -35,5 +45,3 @@ cycle () {
 while true; do
 	cycle;
 done
-
-
